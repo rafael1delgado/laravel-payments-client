@@ -21,29 +21,6 @@ class ClientController extends Controller
      */
     public function __invoke()
     {
-        $payment = Payment::find(1)->makeVisible('created_at');
-
-        $date = $payment->created_at->format('Y-m-d');
-        $dollarExists = Dollar::whereDate('date', $date)->exists();
-        return response()->json($dollarExists);
-
-        if(!$dollarExists)
-        {
-            // If the dollar value for the date does not exist in the dollars table, I consult the Dollar Service
-            DollarService::request();
-        }
-
-        $dollar = Dollar::whereDate('date', $date);
-        if($dollar->exists())
-        {
-            $dollarFound = $dollar->first();
-
-            $payment->update([
-                'status' => PaymentStatus::paid,
-                'clp_usd' => $dollarFound->value,
-            ]);
-        }
-
         try {
             $clients = Client::all();
             return response()->json($clients, Response::HTTP_OK);
